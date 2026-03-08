@@ -1,0 +1,39 @@
+{
+  "name": "magenta-cli",
+  "version": "0.0.1",
+  "description": "Unofficial CLI for Magenta Telekom Austria",
+  "type": "module",
+  "bin": {
+    "magenta": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build --compile --minify src/index.ts --outfile dist/magenta",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.0.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "yarn@1.22.22",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomLadder/magenta-cli"
+  },
+  "keywords": [
+    "magenta",
+    "t-mobile",
+    "austria",
+    "mobile",
+    "cli",
+    "invoices"
+  ]
+}
