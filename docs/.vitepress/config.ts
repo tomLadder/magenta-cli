@@ -7,7 +7,7 @@ export default defineConfig({
   base: '/magenta-cli/',
 
   head: [
-    ['meta', { name: 'theme-color', content: '#e20074' }],
+    ['meta', { name: 'theme-color', content: '#E20174' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:site_name', content: 'magenta-cli' }],
   ],
