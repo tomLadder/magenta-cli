@@ -62,11 +62,17 @@
 
 ## Installation
 
-### Prerequisites
+### Quick Install (macOS / Linux)
 
-- [Bun](https://bun.sh) v1.0 or higher
+```bash
+curl -fsSL https://raw.githubusercontent.com/tomLadder/magenta-cli/main/install.sh | sh
+```
+
+Pre-built binaries are also available on the [Releases page](https://github.com/tomLadder/magenta-cli/releases).
 
 ### From Source
+
+**Prerequisites:** [Bun](https://bun.sh) v1.0 or higher
 
 ```bash
 # Clone the repository

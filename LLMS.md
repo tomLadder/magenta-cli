@@ -6,6 +6,14 @@ This guide helps AI assistants use magenta-cli effectively.
 
 magenta-cli is a command-line tool for interacting with Magenta Telekom Austria. It allows users to manage their account, view invoices, and download bills.
 
+## Installation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tomLadder/magenta-cli/main/install.sh | sh
+```
+
+Pre-built binaries are also available on the [Releases page](https://github.com/tomLadder/magenta-cli/releases).
+
 ## Authentication
 
 Magenta uses password-based authentication with RSA encryption:
