@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import prompts from 'prompts';
 import { login, logout, getStatus } from '../../api/auth.ts';
+import { getProfile } from '../../api/profile.ts';
 import { isLoggedIn, getAuth } from '../../store/config.ts';
 
 export function registerAuthCommands(program: Command): void {
@@ -136,27 +137,36 @@ export function registerAuthCommands(program: Command): void {
         return;
       }
 
-      const result = await getStatus();
+      const spinner = options.json ? null : ora('Fetching user info...').start();
+      const result = await getProfile();
 
       if (!result.success || !result.data) {
         if (options.json) {
           console.log(JSON.stringify({ success: false, error: result.error }));
         } else {
+          spinner?.fail('Failed to fetch user info');
           console.log(chalk.red('Error:'), result.error);
         }
         return;
       }
+
+      spinner?.stop();
 
       if (options.json) {
         console.log(JSON.stringify(result.data, null, 2));
         return;
       }
 
+      const profile = result.data;
       console.log();
       console.log(chalk.bold('User Information'));
-      console.log(chalk.gray('-'.repeat(40)));
-      console.log(chalk.cyan('Username:'), result.data.username);
-      console.log(chalk.cyan('Logged in:'), result.data.loggedIn ? 'Yes' : 'No');
+      console.log(chalk.gray('─'.repeat(40)));
+      console.log(chalk.cyan('Name:'), `${profile.firstName} ${profile.lastName}`);
+      console.log(chalk.cyan('Username:'), profile.username);
+      console.log(chalk.cyan('Email:'), profile.contactEmailAddress);
+      console.log(chalk.cyan('Phone:'), formatPhone(profile.contactPhoneNo));
+      console.log(chalk.cyan('Birth Date:'), profile.birthDate);
+      console.log(chalk.cyan('Profile ID:'), profile.id);
     });
 
   program
@@ -171,6 +181,7 @@ export function registerAuthCommands(program: Command): void {
         console.log(JSON.stringify({
           loggedIn: status.data?.loggedIn || false,
           username: auth?.username,
+          tokenExpiresAt: auth?.accessExpiresAt ? new Date(auth.accessExpiresAt).toISOString() : null,
           ...status.data,
         }, null, 2));
         return;
@@ -182,5 +193,20 @@ export function registerAuthCommands(program: Command): void {
       }
 
       console.log(chalk.green('Logged in as:'), status.data.username);
+      if (auth?.accessExpiresAt) {
+        const expiresIn = Math.floor((auth.accessExpiresAt - Date.now()) / 1000 / 60);
+        if (expiresIn > 0) {
+          console.log(chalk.cyan('Token expires in:'), `${expiresIn} minutes`);
+        } else {
+          console.log(chalk.yellow('Token expired'));
+        }
+      }
     });
+}
+
+function formatPhone(phone: string): string {
+  if (phone.startsWith('43')) {
+    return `+${phone.slice(0, 2)} ${phone.slice(2)}`;
+  }
+  return phone;
 }

@@ -18,7 +18,7 @@ export function registerConfigCommands(program: Command): void {
         // Remove sensitive data for display
         const sanitized = {
           ...cfg,
-          auth: cfg.auth ? { username: cfg.auth.username, hasSession: !!cfg.auth.sessionId } : undefined,
+          auth: cfg.auth ? { username: cfg.auth.username, hasSession: !!cfg.auth.accessToken } : undefined,
         };
         console.log(JSON.stringify(sanitized, null, 2));
         return;

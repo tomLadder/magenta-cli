@@ -1,14 +1,20 @@
 import type { ApiResponse } from '../types/index.ts';
 import { getAuth } from '../store/config.ts';
 
-// TODO: Update with actual Magenta API base URL
-const BASE_URL = 'https://api.magenta.at';
+const BFF_DOMAIN = 'https://onewebbff.svc.magenta.at';
+const API_KEY = '3618a760-c2c6-4b4b-8b76-4eac52e0120d';
 
 const DEFAULT_HEADERS: Record<string, string> = {
-  'accept': 'application/json',
-  'content-type': 'application/json',
-  'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+  'Origin': 'https://www.magenta.at',
+  'Referer': 'https://www.magenta.at/',
 };
+
+function generateUUID(): string {
+  return crypto.randomUUID();
+}
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -23,19 +29,24 @@ export async function apiRequest<T>(
 
   const requestHeaders: Record<string, string> = {
     ...DEFAULT_HEADERS,
+    'x-request-session-id': generateUUID(),
+    'x-request-tracking-id': generateUUID(),
     ...headers,
   };
 
-  // Add session if authenticated request
   if (authenticated) {
     const auth = await getAuth();
-    if (auth?.sessionId) {
-      requestHeaders['Authorization'] = `Bearer ${auth.sessionId}`;
+    if (auth?.accessToken) {
+      requestHeaders['Authorization'] = `Bearer ${auth.accessToken}`;
+    } else {
+      requestHeaders['Authorization'] = API_KEY;
     }
+  } else {
+    requestHeaders['Authorization'] = API_KEY;
   }
 
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(`${BFF_DOMAIN}${endpoint}`, {
       method,
       headers: requestHeaders,
       body: body ? JSON.stringify(body) : undefined,
@@ -102,15 +113,19 @@ export async function downloadFile(
 
   const headers: Record<string, string> = {
     ...DEFAULT_HEADERS,
-    'accept': '*/*',
+    'Accept': '*/*',
+    'x-request-session-id': generateUUID(),
+    'x-request-tracking-id': generateUUID(),
   };
 
-  if (auth?.sessionId) {
-    headers['Authorization'] = `Bearer ${auth.sessionId}`;
+  if (auth?.accessToken) {
+    headers['Authorization'] = `Bearer ${auth.accessToken}`;
+  } else {
+    headers['Authorization'] = API_KEY;
   }
 
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(`${BFF_DOMAIN}${endpoint}`, {
       method: 'GET',
       headers,
     });

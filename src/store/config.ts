@@ -57,7 +57,21 @@ export async function clearAuth(): Promise<void> {
 
 export async function isLoggedIn(): Promise<boolean> {
   const auth = await getAuth();
-  return !!auth?.sessionId;
+  if (!auth?.accessToken) return false;
+  // Check if token is expired
+  return Date.now() < auth.accessExpiresAt;
+}
+
+export async function getDeviceId(): Promise<string> {
+  const config = await loadConfig();
+  if (config.deviceId) {
+    return config.deviceId;
+  }
+  // Generate and persist a new device ID
+  const deviceId = crypto.randomUUID();
+  config.deviceId = deviceId;
+  await saveConfig(config);
+  return deviceId;
 }
 
 export async function getSetting<K extends keyof Config['settings']>(
